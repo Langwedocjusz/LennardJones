@@ -9,6 +9,9 @@ workspace "LennardJones"
 
     outputdir = "%{cfg.buildcfg}-%{cfg.architecture}"
 
+    include "vendor/glfw"
+    include "vendor/glad"
+
     project "LennardJones"
         kind "ConsoleApp"
         language "C++"
@@ -25,7 +28,19 @@ workspace "LennardJones"
         }
 
         includedirs {
-            "%{prj.name}/src"
+            "%{prj.name}/src",
+            "vendor/glfw/include",
+            "vendor/glad/include"
+        }
+
+        links {
+            "glfw",
+            "glad",
+            "opengl32.lib"
+        }
+
+        defines {
+            "GLFW_INCLUDE_NONE"
         }
 
         filter "configurations:Debug"
