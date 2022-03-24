@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 class Shader {
 public:
@@ -8,6 +9,10 @@ public:
 	~Shader();
 
 	void Bind();
+	void setUniform1f(const std::string& name, float x);
 private:
 	unsigned int m_ID;
+
+	unsigned int getUniformLocation(const std::string& name);
+	std::vector<std::pair<std::string, unsigned int>> m_UniformCache;
 };

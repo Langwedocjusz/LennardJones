@@ -77,3 +77,22 @@ Shader::~Shader() {
 void Shader::Bind() {
 	glUseProgram(m_ID);
 }
+
+unsigned int Shader::getUniformLocation(const std::string& name) {
+	auto search_result = std::find_if(m_UniformCache.begin(), m_UniformCache.end(),
+		[&name](const std::pair<std::string, unsigned int>& element) { 
+			return element.first == name; 
+		});
+
+	if (search_result != m_UniformCache.end())
+		return search_result->second;
+
+	const unsigned int location = glGetUniformLocation(m_ID, name.c_str());
+	m_UniformCache.push_back(std::make_pair(name, location));
+	return location;
+}
+
+void Shader::setUniform1f(const std::string& name, float x) {
+	const unsigned int location = getUniformLocation(name.c_str());
+	glUniform1f(location, x);
+}

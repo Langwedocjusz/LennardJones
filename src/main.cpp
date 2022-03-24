@@ -3,6 +3,13 @@
 
 #include "Shader.h"
 
+#include <random>
+
+struct WindowData {
+    std::string Title;
+    unsigned int Width, Height;
+};
+
 int main() {
     //Initializing GLFW:
     glfwInit();
@@ -11,9 +18,15 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     //Creating a window:
-    constexpr int width = 800, height = 600;
-    constexpr char* title = "LennardJones";
-    GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
+    WindowData window_data;
+    window_data.Width = 800;
+    window_data.Height = 600;
+    window_data.Title = "LennardJones";
+
+    GLFWwindow* window = glfwCreateWindow(window_data.Width, window_data.Height, 
+                                          window_data.Title.c_str(), NULL, NULL);
+
+    glfwSetWindowUserPointer(window, &window_data);
 
     if (window == nullptr) {
         glfwTerminate();
@@ -29,13 +42,43 @@ int main() {
         return -1;
     }
 
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int wdth, int hgth) {
+        WindowData& data = *(WindowData*)glfwGetWindowUserPointer(win);
+        data.Width = wdth;
+        data.Height = hgth;
+        glViewport(0, 0, wdth, hgth);
+    });
+
+    constexpr int num_of_points = 3000;
+    float instance_pos[4 * num_of_points];
+
+    std::random_device rd;
+    std::mt19937 e2(rd());
+    std::uniform_real_distribution<> dist(-1.0, 1.0);
+
+    for (int i = 0; i < num_of_points; i++) {
+        instance_pos[4 * i + 0] = dist(e2);
+        instance_pos[4 * i + 1] = dist(e2);
+        instance_pos[4 * i + 2] = 0.0f;
+        instance_pos[4 * i + 3] = 0.0f;
+    }
+
+    unsigned int instance_vbo;
+
+    glGenBuffers(1, &instance_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(instance_pos), instance_pos, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    constexpr float world_rng = 0.5f, uv_rng = 1.0f, normalized_rng = 1.0f;
+    float quad_data[24] = {-world_rng, -world_rng, -uv_rng, -uv_rng,
+                            world_rng, -world_rng,  uv_rng, -uv_rng,
+                            world_rng,  world_rng,  uv_rng,  uv_rng,
+                           -world_rng, -world_rng, -uv_rng, -uv_rng,
+                            world_rng,  world_rng,  uv_rng,  uv_rng,
+                           -world_rng,  world_rng, -uv_rng,  uv_rng};
+
     unsigned int vao, vbo;
-    float vertex_data[24] = {-0.5f, -0.5f, -1.0f, -1.0f,
-                              0.5f, -0.5f,  1.0f, -1.0f,
-                              0.5f,  0.5f,  1.0f,  1.0f,
-                             -0.5f, -0.5f, -1.0f, -1.0f,
-                              0.5f,  0.5f,  1.0f,  1.0f,
-                             -0.5f,  0.5f, -1.0f,  1.0f};
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -43,25 +86,46 @@ int main() {
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_data), quad_data, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    Shader shader("shaders/QuadPoints.vs", "shaders/QuadPoints.fs");
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), (void*)0);
+    glVertexAttribDivisor(2, 1);
 
+    Shader shader("shaders/QuadPoints.vs", "shaders/QuadPoints.fs");
+    constexpr float pixel_smoothness = 2.0f, quad_size_mult = 0.05f;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        float aspect = float(window_data.Width) / float(window_data.Height);
+        float min_res = static_cast<float>(std::min(window_data.Width, window_data.Height));
+
+        float scale_x = (aspect < 1.0f) ? 1.0f : 1.0f / aspect;
+        float scale_y = (aspect < 1.0f) ? aspect : 1.0f;
+
+        float px_per_quad = min_res * world_rng / normalized_rng;
+        float uv_smoothness = pixel_smoothness * (2.0f * uv_rng) / px_per_quad;
+
         shader.Bind();
+        shader.setUniform1f("scale_x", scale_x);
+        shader.setUniform1f("scale_y", scale_y);
+        shader.setUniform1f("scale_mult", quad_size_mult);
+        shader.setUniform1f("smoothness", uv_smoothness);
 
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, num_of_points);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
