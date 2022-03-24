@@ -70,13 +70,12 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(instance_pos), instance_pos, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    constexpr float world_rng = 0.5f, uv_rng = 1.0f, normalized_rng = 1.0f;
-    float quad_data[24] = {-world_rng, -world_rng, -uv_rng, -uv_rng,
-                            world_rng, -world_rng,  uv_rng, -uv_rng,
-                            world_rng,  world_rng,  uv_rng,  uv_rng,
-                           -world_rng, -world_rng, -uv_rng, -uv_rng,
-                            world_rng,  world_rng,  uv_rng,  uv_rng,
-                           -world_rng,  world_rng, -uv_rng,  uv_rng};
+    float quad_data[24] = {-0.5f, -0.5f, -1.0f, -1.0f,
+                            0.5f, -0.5f,  1.0f, -1.0f,
+                            0.5f,  0.5f,  1.0f,  1.0f,
+                           -0.5f, -0.5f, -1.0f, -1.0f,
+                            0.5f,  0.5f,  1.0f,  1.0f,
+                           -0.5f,  0.5f, -1.0f,  1.0f};
 
     unsigned int vao, vbo;
 
@@ -99,7 +98,7 @@ int main() {
     glVertexAttribDivisor(2, 1);
 
     Shader shader("shaders/QuadPoints.vs", "shaders/QuadPoints.fs");
-    constexpr float pixel_smoothness = 2.0f, quad_size_mult = 0.05f;
+    constexpr float pixel_smoothness = 2.0f, quad_size_px = 10.0f;
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -114,8 +113,8 @@ int main() {
         float scale_x = (aspect < 1.0f) ? 1.0f : 1.0f / aspect;
         float scale_y = (aspect < 1.0f) ? aspect : 1.0f;
 
-        float px_per_quad = min_res * world_rng / normalized_rng;
-        float uv_smoothness = pixel_smoothness * (2.0f * uv_rng) / px_per_quad;
+        float quad_size_mult = 2.0f * quad_size_px / min_res;
+        float uv_smoothness = 2.0f * pixel_smoothness  / quad_size_px;
 
         shader.Bind();
         shader.setUniform1f("scale_x", scale_x);

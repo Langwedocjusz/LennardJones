@@ -12,7 +12,8 @@ uniform float scale_y;
 uniform float scale_mult;
 
 void main() {
-    vec3 pos = scale_mult*vec3(scale_x*aPos.x, scale_y*aPos.y, 0.0);
-    gl_Position = vec4(pos, 1.0) + aInstPos;
+    gl_Position = vec4(scale_mult*aPos, 0.0, 1.0) + aInstPos;
+    gl_Position.x *= scale_x;
+    gl_Position.y *= scale_y;
     uv = aUV;
 }
