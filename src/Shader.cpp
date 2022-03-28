@@ -67,7 +67,7 @@ Shader::Shader(const std::string& vs_path, const std::string& fs_path) {
 }
 
 Shader::Shader(const std::string& compute_path) {
-
+	m_ID = 0;
 }
 
 Shader::~Shader() {

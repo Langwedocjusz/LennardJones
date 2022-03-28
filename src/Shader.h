@@ -11,7 +11,7 @@ public:
 	void Bind();
 	void setUniform1f(const std::string& name, float x);
 private:
-	unsigned int m_ID;
+	unsigned int m_ID = 0;
 
 	unsigned int getUniformLocation(const std::string& name);
 	std::vector<std::pair<std::string, unsigned int>> m_UniformCache;
