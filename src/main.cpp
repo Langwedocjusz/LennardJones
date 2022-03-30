@@ -15,7 +15,7 @@ int main() {
     instance_pos.reserve(num_of_points);
 
     for (int i = 0; i < num_of_points; i++) {
-        instance_pos.emplace_back(dist(e2), dist(e2), 0.0f, 0.0f);
+        instance_pos.emplace_back(dist(e2), dist(e2), 0.05f, 0.05f);
     }
 
     NaiveCPUSim simulator(&instance_pos, DT, epsilon, sigma, L);

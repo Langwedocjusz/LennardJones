@@ -15,8 +15,6 @@ void NaiveCPUSim::OnUpdate() {
         for (size_t j = 0; j < m_Data->size(); j++) {
             if (i != j) {
                 //TO-DO: Lennard Jones force calculation
-                F_x = 0.01f;
-                F_y = 0.01f;
             }
         }
         //2. Update velocities
