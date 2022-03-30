@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#pragma once
+
 #include <vector>
 
 class Shader {

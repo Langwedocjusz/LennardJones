@@ -10,10 +10,14 @@ out vec2 uv;
 uniform float scale_x;
 uniform float scale_y;
 uniform float scale_mult;
+uniform float L;
 
 void main() {
-    gl_Position = vec4(scale_mult*aPos, 0.0, 1.0) + aInstPos;
+    vec4 norm_inst_pos = vec4(2.0/L, 2.0/L, 1.0, 1.0)*aInstPos - vec4(1.0, 1.0, 0.0, 0.0);
+
+    gl_Position = vec4(scale_mult*aPos, 0.0, 1.0) + norm_inst_pos;
     gl_Position.x *= scale_x;
     gl_Position.y *= scale_y;
+
     uv = aUV;
 }

@@ -2,8 +2,63 @@
 
 #include "glad/glad.h"
 
-Renderer::Renderer(std::vector<float>* data) : m_InstanceData(data)
+Renderer::Renderer(std::vector<Particle>* data) : m_InstanceData(data)
 {
+    Init();
+}
+
+Renderer::Renderer(std::vector<Particle>* data, float l) 
+    : m_InstanceData(data), m_L(l)
+{
+    Init();
+}
+
+bool Renderer::ShouldClose() {
+    return glfwWindowShouldClose(m_Window);
+}
+
+Renderer::~Renderer() {
+    glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteBuffers(1, &m_InstanceVBO);
+
+    delete m_Shader;
+}
+
+void Renderer::OnRender() {
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    float aspect = float(m_WindowData.Width) / float(m_WindowData.Height);
+    float min_res = static_cast<float>(std::min(m_WindowData.Width, m_WindowData.Height));
+
+    float scale_x = (aspect < 1.0f) ? 1.0f : 1.0f / aspect;
+    float scale_y = (aspect < 1.0f) ? aspect : 1.0f;
+
+    float quad_size_mult = 2.0f * m_quadSize / min_res;
+    float uv_smoothness = 2.0f * m_pxSmoothness / m_quadSize;
+
+    m_Shader->Bind();
+    m_Shader->setUniform1f("scale_x", scale_x);
+    m_Shader->setUniform1f("scale_y", scale_y);
+    m_Shader->setUniform1f("scale_mult", quad_size_mult);
+    m_Shader->setUniform1f("L", m_L);
+    m_Shader->setUniform1f("smoothness", uv_smoothness);
+
+    glBindVertexArray(m_VAO);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_InstanceCount);
+
+    glfwSwapBuffers(m_Window);
+    glfwPollEvents();
+}
+
+void Renderer::UpdateFromCPU(std::vector<Particle>* user_data) {
+    glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * user_data->size(), &user_data->at(0), GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Renderer::Init() {
     //Initializing GLFW:
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -42,7 +97,7 @@ Renderer::Renderer(std::vector<float>* data) : m_InstanceData(data)
 
     glGenBuffers(1, &m_InstanceVBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*m_InstanceCount, &m_InstanceData->at(0), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Particle) * m_InstanceCount, &m_InstanceData->at(0), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     float quad_data[24] = { -0.5f, -0.5f, -1.0f, -1.0f,
@@ -74,42 +129,4 @@ Renderer::Renderer(std::vector<float>* data) : m_InstanceData(data)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-bool Renderer::ShouldClose() {
-    return glfwWindowShouldClose(m_Window);
-}
-
-Renderer::~Renderer() {
-    glDeleteVertexArrays(1, &m_VAO);
-    glDeleteBuffers(1, &m_VBO);
-    glDeleteBuffers(1, &m_InstanceVBO);
-
-    delete m_Shader;
-}
-
-void Renderer::OnRender() {
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    float aspect = float(m_WindowData.Width) / float(m_WindowData.Height);
-    float min_res = static_cast<float>(std::min(m_WindowData.Width, m_WindowData.Height));
-
-    float scale_x = (aspect < 1.0f) ? 1.0f : 1.0f / aspect;
-    float scale_y = (aspect < 1.0f) ? aspect : 1.0f;
-
-    float quad_size_mult = 2.0f * m_quadSize / min_res;
-    float uv_smoothness = 2.0f * m_pxSmoothness / m_quadSize;
-
-    m_Shader->Bind();
-    m_Shader->setUniform1f("scale_x", scale_x);
-    m_Shader->setUniform1f("scale_y", scale_y);
-    m_Shader->setUniform1f("scale_mult", quad_size_mult);
-    m_Shader->setUniform1f("smoothness", uv_smoothness);
-
-    glBindVertexArray(m_VAO);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, m_InstanceCount);
-
-    glfwSwapBuffers(m_Window);
-    glfwPollEvents();
 }
