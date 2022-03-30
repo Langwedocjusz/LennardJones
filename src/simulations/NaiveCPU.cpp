@@ -15,11 +15,13 @@ void NaiveCPUSim::OnUpdate() {
         for (size_t j = 0; j < m_Data->size(); j++) {
             if (i != j) {
                 //TO-DO: Lennard Jones force calculation
+                F_x = 0.01f;
+                F_y = 0.01f;
             }
         }
         //2. Update velocities
         particle->vel_x += m_DT * F_x;
-        particle->vel_x += m_DT * F_x;
+        particle->vel_y += m_DT * F_y;
 
         //3. Update positions
         particle->pos_x += m_DT * particle->vel_x;
@@ -27,6 +29,6 @@ void NaiveCPUSim::OnUpdate() {
 
         //4. Enforce boundary conditions
         particle->pos_x = fmod(particle->pos_x, m_L);
-        particle->pos_x = fmod(particle->pos_x, m_L);
+        particle->pos_y = fmod(particle->pos_y, m_L);
     }
 }

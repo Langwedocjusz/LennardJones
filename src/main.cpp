@@ -1,11 +1,7 @@
-#include "Utils.h"
-
 #include "Renderer.h"
 #include "simulations/NaiveCPU.h"
 
 #include <random>
-#include <vector>
-#include <cmath>
 
 int main() {
     constexpr int num_of_points = 10000;
