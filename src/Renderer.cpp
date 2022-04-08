@@ -89,6 +89,9 @@ void Renderer::Init() {
         glViewport(0, 0, wdth, hgth);
         });
 
+    //Enable Vsync
+    glfwSwapInterval(1);
+
     //Compile shaders after API initialization:
     m_Shader = new Shader("shaders/QuadPoints.vs", "shaders/QuadPoints.fs");
 
@@ -126,7 +129,6 @@ void Renderer::Init() {
     glVertexAttribDivisor(2, 1);
 
     //GL settings:
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }

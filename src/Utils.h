@@ -9,3 +9,8 @@ public:
 	float vel_x;
 	float vel_y;
 };
+
+namespace utils {
+	void Kahan_summation(float& sum, float input, float& c);
+	float safediv(float x, float y);
+}
