@@ -1,7 +1,7 @@
-#include <iostream>
-#include <string>
 #pragma once
 
+#include <iostream>
+#include <string>
 #include <vector>
 
 class Shader {
@@ -12,6 +12,8 @@ public:
 
 	void Bind();
 	void setUniform1f(const std::string& name, float x);
+	void setUniform1ui(const std::string& name, unsigned int x);
+
 private:
 	unsigned int m_ID = 0;
 

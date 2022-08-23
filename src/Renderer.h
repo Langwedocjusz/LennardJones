@@ -24,6 +24,8 @@ public:
 	void setSmoothness(float s) { m_pxSmoothness = s; }
 	void setQuadSize(float s) { m_quadSize = s; }
 	void setBoundarySize(float s) { m_L = s; }
+
+	std::pair<unsigned int, unsigned int> exposeHandles() { return std::make_pair(m_VAO, m_InstanceVBO); }
 	void UpdateFromCPU(std::vector<Particle>* user_data);
 private:
 	//Window handles:

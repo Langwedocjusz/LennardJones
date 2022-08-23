@@ -13,4 +13,5 @@ public:
 namespace utils {
 	void Kahan_summation(float& sum, float input, float& c);
 	float safediv(float x, float y);
+	float sgn(float x);
 }

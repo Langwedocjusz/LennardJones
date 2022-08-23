@@ -18,8 +18,8 @@ void NaiveCPUSim::CalcForce(float& F_x, float& F_y, size_t i, Particle* particle
             float d_x = (*m_Data)[j].pos_x - particle->pos_x;
             float d_y = (*m_Data)[j].pos_y - particle->pos_y;
             //Boundary conditions on differences:
-            d_x = (abs(d_x) < m_L - abs(d_x)) ? d_x : abs(d_x) - m_L;
-            d_y = (abs(d_y) < m_L - abs(d_y)) ? d_y : abs(d_y) - m_L;
+            d_x = (abs(d_x) < 0.5f * m_L) ? d_x : -1.0f * utils::sgn(d_x) * (m_L - abs(d_x));
+            d_y = (abs(d_y) < 0.5f * m_L) ? d_y : -1.0f * utils::sgn(d_y) * (m_L - abs(d_y));
 
             float r = sqrt(d_x * d_x + d_y * d_y);
             float x = utils::safediv(m_Sigma, r);

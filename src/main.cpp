@@ -1,21 +1,8 @@
 #include "Renderer.h"
 #include "simulations/NaiveCPU.h"
+#include "simulations/GLCompute.h"
 
 #include <random>
-
-/*std::random_device rd;
-std::mt19937 e2(rd());
-std::uniform_real_distribution<> pos_dist(0.0f, L);
-std::uniform_real_distribution<> vel_dist(-0.5f, 0.5f);
-
-for (int i = 0; i < num_of_points; i++) {
-    instance_pos.emplace_back(
-        L / sqrt(num_of_points) * fmod(i, sqrt(num_of_points)),
-        L / sqrt(num_of_points) * floor(i / sqrt(num_of_points)),
-        vel_dist(e2), vel_dist(e2));
-
-    //instance_pos.emplace_back(pos_dist(e2), pos_dist(e2), vel_dist(e2), vel_dist(e2));
-}*/
 
 int main() {
     constexpr int num_of_points = 512;
@@ -38,13 +25,24 @@ int main() {
             vel_dist(e2) );
     }
 
-    NaiveCPUSim simulator(&instance_pos, DT, epsilon, sigma, mass, L);
     Renderer renderer(&instance_pos, L);
+    renderer.setQuadSize(20.0f);
+
+    //NaiveCPUSim simulator(&instance_pos, DT, epsilon, sigma, mass, L);
+
+    GLComputeSim simulator("shaders/ComputeSim.glsl");
+    simulator.setL(L);
+    simulator.setDT(DT);
+    simulator.setEpsilon(epsilon);
+    simulator.setSigma(sigma);
+    simulator.setMass(mass);
+    simulator.setNumber(num_of_points);
+    simulator.setHandles(renderer.exposeHandles());
 
     while (!renderer.ShouldClose()) {
         simulator.OnUpdate();
 
-        renderer.UpdateFromCPU(&instance_pos);
+        //renderer.UpdateFromCPU(&instance_pos);
 
         renderer.OnRender();
     }

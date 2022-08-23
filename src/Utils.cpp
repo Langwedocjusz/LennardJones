@@ -22,3 +22,7 @@ float utils::safediv(float x, float y) {
     else
         return div;
 }
+
+float utils::sgn(float x) {
+    return static_cast<float>(x > 0.0f) - static_cast<float>(x < 0.0f);
+}
