@@ -17,7 +17,7 @@ void utils::Kahan_summation(float& sum, float input, float& c) {
 float utils::safediv(float x, float y) {
     float div = x / y;
 
-    if (isnan(div) || isinf(div))
+    if (std::isnan(div) || std::isinf(div))
         return 0.0f;
     else
         return div;

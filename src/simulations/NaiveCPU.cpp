@@ -62,8 +62,8 @@ void NaiveCPUSim::OnUpdate() {
         particle->pos_y += particle->vel_y * m_DT;
 
         //2. Enforce boundary conditions
-        particle->pos_x -= m_L * std::floorf(m_InvL * particle->pos_x);
-        particle->pos_y -= m_L * std::floorf(m_InvL * particle->pos_y);
+        particle->pos_x -= m_L * std::floor(m_InvL * particle->pos_x);
+        particle->pos_y -= m_L * std::floor(m_InvL * particle->pos_y);
 
         //3. Update velocities
         CalcForce(F_x, F_y, i, particle);

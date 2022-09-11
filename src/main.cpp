@@ -19,7 +19,7 @@ int main() {
 
     for (int i = 0; i < num_of_points; i++) {
         instance_pos.emplace_back(
-            L/sqrt(num_of_points) * (0.5f + std::floorf(i/sqrt(num_of_points)) ) + pos_dist(e2), 
+            L/sqrt(num_of_points) * (0.5f + std::floor(i/sqrt(num_of_points)) ) + pos_dist(e2), 
             L/sqrt(num_of_points) * (0.5f + std::fmod(i, sqrt(num_of_points)) ) + pos_dist(e2),
             vel_dist(e2), 
             vel_dist(e2) );
