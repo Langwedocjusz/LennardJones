@@ -30,6 +30,13 @@ float safediv(float x, float y) {
         return div;
 }
 
+//void Kahan_Sum(inout vec2 sum, vec2 x, inout vec2 c) {
+//    vec2 y = x - c;
+//    vec2 t = sum + y;
+//    c = (t - sum) - y;
+//    sum = t;
+//}
+
 float sgn(float x) {
     return float(x>0.0) - float(x<0.0);
 }
@@ -43,7 +50,7 @@ void CalcForce(inout vec2 F, uint i) {
             vec2 d = particles[j].position - particles[i].position;
             //Boundary conditions on differences:
             d.x = (abs(d.x) < 0.5 * uL) ? d.x : -1.0 * sgn(d.x) * (uL - abs(d.x));
-            d.x = (abs(d.y) < 0.5 * uL) ? d.y : -1.0 * sgn(d.y) * (uL - abs(d.y));
+            d.y = (abs(d.y) < 0.5 * uL) ? d.y : -1.0 * sgn(d.y) * (uL - abs(d.y));
 
             float r = length(d);
             float x = safediv(uSigma, r);
@@ -53,6 +60,7 @@ void CalcForce(inout vec2 F, uint i) {
             vec2 ff = -f*d;
 
             F += ff;
+            //Kahan_Sum(F, ff, c);
         }
     }
 }

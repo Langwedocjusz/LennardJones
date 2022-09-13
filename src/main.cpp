@@ -5,8 +5,8 @@
 #include <random>
 
 int main() {
-    constexpr int num_of_points = 512;
-    constexpr float mass = 100.0f, sigma = 0.0f, epsilon = 0.0f, DT = 0.001f, L = 10.0f;
+    constexpr int num_of_points = 1024;
+    constexpr float mass = 100.0f, sigma = 0.1f, epsilon = 0.01f, DT = 0.001f, L = 10.0f;
 
     std::vector<Particle> instance_pos;
     instance_pos.reserve(num_of_points);
@@ -26,7 +26,7 @@ int main() {
     }
 
     Renderer renderer(&instance_pos, L);
-    renderer.setQuadSize(20.0f);
+    renderer.setQuadSize(10.0f);
 
     //NaiveCPUSim simulator(&instance_pos, DT, epsilon, sigma, mass, L);
 
