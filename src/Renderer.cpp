@@ -93,7 +93,7 @@ void Renderer::Init() {
     glfwSwapInterval(1);
 
     //Compile shaders after API initialization:
-    m_Shader = new Shader("shaders/QuadPoints.vs", "shaders/QuadPoints.fs");
+    m_Shader = new Shader("shaders/QuadPoints.vert", "shaders/QuadPoints.frag");
 
     //GL vertex data:
     m_InstanceCount = static_cast<unsigned int>(m_InstanceData->size());
