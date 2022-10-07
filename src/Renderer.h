@@ -25,15 +25,21 @@ public:
 	void setQuadSize(float s) { m_quadSize = s; }
 	void setBoundarySize(float s) { m_L = s; }
 
+    void setIterationsLimit(int n) {m_LimitIterations = true; m_MaxIterations = n;}
+
 	std::pair<unsigned int, unsigned int> exposeHandles() { return std::make_pair(m_VAO, m_InstanceVBO); }
 	void UpdateFromCPU(std::vector<Particle>* user_data);
 private:
 	//Window handles:
 	GLFWwindow* m_Window ;
 	WindowData m_WindowData;
-	//Particle data:
-	std::vector<Particle>* m_InstanceData;
+	//Particle data: 
 	unsigned int m_InstanceCount;
+	std::vector<Particle>* m_InstanceData;
+    //Limit iterations
+    bool m_LimitIterations = false;
+    unsigned int m_MaxIterations = 0;
+    unsigned int m_Iteration = 0;
 	//GL handles:
 	unsigned int m_VAO = 0, m_VBO = 0, m_InstanceVBO = 0;
 	Shader* m_Shader;

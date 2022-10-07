@@ -2,11 +2,6 @@
 
 #include "glad/glad.h"
 
-Renderer::Renderer(std::vector<Particle>* data) : m_InstanceData(data)
-{
-    Init();
-}
-
 Renderer::Renderer(std::vector<Particle>* data, float l) 
     : m_InstanceData(data), m_L(l)
 {
@@ -14,7 +9,14 @@ Renderer::Renderer(std::vector<Particle>* data, float l)
 }
 
 bool Renderer::ShouldClose() {
-    return glfwWindowShouldClose(m_Window);
+    bool result = glfwWindowShouldClose(m_Window);
+    
+    if (m_LimitIterations) {
+        result = result || (m_Iteration >= m_MaxIterations);
+        ++m_Iteration;
+    }
+
+    return result;
 }
 
 Renderer::~Renderer() {
